@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 import shelve
 from libtmux import Pane
-from .config import Config, get_config
+from .config import get_config
 
 
 @contextmanager

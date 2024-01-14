@@ -96,16 +96,17 @@ class Menu(App):
     # session, _ = get_session()
     server = get_server(config)
     rows = Rows([s for s in server.windows])
+    visible_rows = rows
 
     def set_focus_row(self):
         self.selection_in_progress = True
-        visible_rows = [
+        self.visible_rows = [
             row for row in self.query(Row).results() if row.styles.display == "block"
         ]
-        self.n_visible_rows = len(visible_rows)
+        self.n_visible_rows = len(self.visible_rows)
 
         row_index = 0
-        for index, row in enumerate(visible_rows):
+        for index, row in enumerate(self.visible_rows):
             if index == self.focused_row_index:
                 row_index += 1
                 row.index = row_index
@@ -128,15 +129,16 @@ class Menu(App):
         yield self.rows
 
     def on_key(self, event: events.Key) -> None:
-        if event.name == "down":
-            if self.focused_row_index < self.n_visible_rows - 1:
-                self.focused_row_index += 1
-            self.set_focus_row()
 
-        elif event.name == "up":
-            if self.focused_row_index > 0:
-                self.focused_row_index -= 1
+        if event.name in ["down", "up"]:
+            if event.name == "down":
+                if self.focused_row_index < self.n_visible_rows - 1:
+                    self.focused_row_index += 1
+            else:
+                if self.focused_row_index > 0:
+                    self.focused_row_index -= 1
             self.set_focus_row()
+            self.rows.scroll_to_widget(self.focused_row)
 
         elif event.name == "backspace":
             self.reset_focus_row()
@@ -152,9 +154,11 @@ class Menu(App):
     def on_ready(self) -> None:
         self.store.pane_id_to_connect = None
 
+
 def main():
     app = Menu()
     app.run()
+
 
 if __name__ == "__main__":
     main()

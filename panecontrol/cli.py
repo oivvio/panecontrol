@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-import sys
-import typer
-from pathlib import Path
 import subprocess
+
+import typer
 
 from .menu import Menu
 from .store import Store
@@ -13,17 +12,11 @@ from .config import get_config, get_server, get_session
 menuapp = Menu()
 app = typer.Typer()
 
-# PROJECT_BASE = Path(__file__).parent
-# PYTHON_INTERPRETER = sys.executable
-
-
 @app.command()
 def create_window(name: str):
     """Create window"""
-    #session, _ = get_session()
-    #window = session.new_window(attach=False)
-    server = get_server(get_config())
-    window = server.new_window(attach=False)
+    session, _ = get_session()
+    window = session.new_window(attach=False)
 
     pane = window.panes[0]
     store = Store()
@@ -38,10 +31,7 @@ def attach_pane():
     server = get_server(config)
     session, is_new = get_session()
 
-    #n_windows = len(session.windows)
     n_windows = len(server.windows)
-
-
     store = Store()
 
     if is_new:
@@ -54,7 +44,6 @@ def attach_pane():
         if n_windows == 2:
             # There are two windows but one is for keeping the session around
             # Pick the session and attach it
-            #window = session.windows[1]
             window = server.windows[1]
             cmd = f"tmux -L {config['socket_name']} join-pane -l 80 -h -s {server.name}:{window.id}"
             os.system(cmd)
@@ -63,7 +52,6 @@ def attach_pane():
             # There are many windows
             options = []
 
-            #for index, window in list(enumerate(session.windows))[1:]:
             for index, window in list(enumerate(server.windows))[1:]:
                 shortcut_letter = chr(96 + index)
                 pane_id = window.panes[0].id
@@ -84,38 +72,17 @@ def attach_pane():
             os.system(cmd)
 
 
-# def smallest_integer_not_in_list(lst) -> int:
-#     result = 1
-#     done = False
-#     while not done:
-#         if result not in lst:
-#             return result
-#         result += 1
-
-
 @app.command()
 def break_pane():
     """Send the pane window back to background"""
     config = get_config()
-    # server = get_server(get_config())
     session_name = config["session_name"]
-
-    # cmd = f"tmux -L  {config['socket_name']} break-pane -t {session_name}"
 
     cmd = "tmux"
     arguments = [cmd, "-L", config['socket_name'], "break-pane", "-t", session_name]
 
-    # arguments = ["tmux", "break-pane", "-t", session_name]
+    os.execvp(cmd, arguments)
 
-    #print(cmd, arguments)
-    #os.execvp(cmd, arguments)
-    #os.execvp(cmd, arguments)
-    subprocess.run(arguments)
-    # server.cmd()
-    # server.cmd(arguments)
-
-    #print(cmd, arguments)
-    # os.system(cmd)
 
 
 @app.command()
@@ -124,21 +91,16 @@ def menu():
 
     config = get_config()
 
-    cmd = (
-        #f"tmux display-popup  -E '{PYTHON_INTERPRETER}  {menuscript}'"
-        # f"tmux display-popup   -x 1 -y 1 -h 30 -w 120 '{python}  ~/oprepos/panecontrol/panecontrol/menu.py' "
-    )
-    cmd = f"tmux -L {config['socket_name']}  display-popup -E panecontrol_menu"
-
-    # Display menu in a tmux popup.
-    os.system(cmd)
+    arguments = ["tmux", "-L", config['socket_name'], "display-popup",  "-E",  "panecontrol_menu"]
+    subprocess.run(arguments)
 
     # Pick up users menu selection from store
     store = Store()
+
     if store.pane_id_to_connect:
         config = get_config()
-        cmd = f"tmux -L {config['socket_name']} join-pane -l 80 -h -s {store.pane_id_to_connect}"
-        os.system(cmd)
+        arguments = ["tmux", "-L", config['socket_name'], "join-pane", "-h", "-l", "80", "-s", store.pane_id_to_connect]
+        subprocess.run(arguments)
 
 
 @app.command()
@@ -163,9 +125,9 @@ def bind_keys():
     bind_key("m", "menu")
 
 
-
 def main():
     app()
+
 
 if __name__ == "__main__":
     app()

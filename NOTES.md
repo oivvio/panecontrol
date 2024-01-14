@@ -1,11 +1,5 @@
 # TODOs
 
-+ Add typer for commands
-
-+ Remove all absolute filesystem references.
-
-
-
 + Check how normal vs panecontrol panes behave when attached / detached.
 
 + Make proper python package.
