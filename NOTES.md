@@ -1,47 +1,21 @@
-break-pane but don't move with the pane to the window i ends up in
+# TODOs
 
-    tmux break-pane -d
++ Add typer for commands
 
-break-pane and send it to specific destination
++ Remove all absolute filesystem references.
 
-    tmux break-pane -d -t session:window
 
-# Plan
 
-Create a special session called "quickpane"
++ Check how normal vs panecontrol panes behave when attached / detached.
 
-# Commands
++ Make proper python package.
 
-## new pane
++ Make runnable as tmux plugin
 
-    X # Check if quickpane session exists if not create it
++ Implement join vs steal from menu
 
-    # Create new window in session
 
-    # Join to the new window
-
-## attach pane
-
-If there is only one pick that
-
-If there are several display a choice using display-menu
-
-    window = session.attached_window
-    pane = window.attached_pane
-
-    # Command to display a menu in tmux
-    # This is a basic example; you'll need to modify it based on your actual menu items
-    menu_command = "display-menu -T '#[align=centre] Options' 'Option 1' A 'send-keys \"Option1\"' 'Option 2' B 'send-keys \"Option2\"'"
-
-But probably send something like "join-pane -s 1:2" in the options
-
-    # Send the command to the pane
-    pane.send_keys(menu_command, suppress_history=False)
-
-    # Send the command to the pane
-    pane.send_keys(menu_command, suppress_history=False)
-
-## split pane
+## Split pane
 
     detach the current pane
 
@@ -53,8 +27,7 @@ But probably send something like "join-pane -s 1:2" in the options
 
 panecontrol
 
-
-## Stuff I've figured out 
+## Stuff I've figured out
 
 window id does not persist.
 
@@ -65,23 +38,17 @@ Apply this to session on startup.
 does not work
 
 
-## TODO
-
-### Rejigg. 
+### Rejigg.
 
 We can attach any window from any session. But sessions created with panecontrol
 get special treatment. They get sent to the PANECONTROL session when they are
 not active. They get marked in our shelve storage as special so that we can list
-them in a menu even when they are not currently attached to PANECONTROL.  
+them in a menu even when they are not currently attached to PANECONTROL.
 
-We have two separate attach commands. One attachs panecontrol created windows.
-The other attaches "normal" windows. When we attach a "normal window" we use link instead of join. 
-So the the window will still be attached in it's original session. 
-
-When we detach a window we have to check if it's a panecontrol  window or a normal window.
-
+When we detach a window we have to check if it's a panecontrol window or a normal window.
 
 ### Other stuff
+
 Check name on create, [a-z][A-Z][0-9] only and unique
 
 Create should optionally take input from "tmux input"
@@ -91,3 +58,11 @@ Create should optionally take input from "tmux input"
 Either rip out libtmux or run shell tmux commands like this
 
     session.cmd('new-window', '-n', 'Another Window')
+
+### Textual
+
+Only Input, Button and the like are focusable.
+
+Input + rows
+
+Input listens for up down. If it has focus it will loose focus.

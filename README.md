@@ -18,7 +18,4 @@ TBP
 
 ## Roadmap
 
-[ ] Make proper python package.
-
-[ ] Make runnable as tmux plugin
-
+See NOTES.md
